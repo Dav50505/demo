@@ -8,7 +8,6 @@ export default async function DashboardPage({
 }: { 
   searchParams: Promise<{ payment?: string }> 
 }) {
-  const { userId } = await auth();
   const user = await currentUser();
   const resolvedParams = await searchParams;
   const paymentStatus = resolvedParams.payment;

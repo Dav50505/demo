@@ -15,8 +15,9 @@ export async function POST(req: Request) {
       signature,
       process.env.STRIPE_WEBHOOK_SECRET!
     );
-  } catch (error: any) {
-    return new NextResponse(`Webhook Error: ${error.message}`, { status: 400 });
+  } catch (error: unknown) {
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+    return new NextResponse(`Webhook Error: ${errorMessage}`, { status: 400 });
   }
 
   const session = event.data.object as Stripe.Checkout.Session;
@@ -59,16 +60,20 @@ export async function POST(req: Request) {
 
     case 'invoice.payment_succeeded':
       // Subscription renewed successfully - update the subscription end date
-      const invoice = event.data.object as any; // Using any to bypass type checking
-      if (invoice.subscription) {
-        const subscription = await stripe.subscriptions.retrieve(invoice.subscription as string);
+      const invoiceObject = event.data.object;
+      // Convert to unknown first, then to Record type
+      const subscriptionId = (invoiceObject as unknown as Record<string, unknown>).subscription as string;
+      
+      if (subscriptionId) {
+        const subscription = await stripe.subscriptions.retrieve(subscriptionId);
         
         await prisma.subscription.updateMany({
           where: {
             stripeSubscriptionId: subscription.id,
           },
           data: {
-            stripeCurrentPeriodEnd: new Date((subscription as any).current_period_end * 1000),
+            // Use explicit numeric cast for timestamps
+            stripeCurrentPeriodEnd: new Date((subscription as unknown as { current_period_end: number }).current_period_end * 1000),
             active: true,
           },
         });
