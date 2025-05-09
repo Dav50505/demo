@@ -6,11 +6,12 @@ import SuccessMessage from "@/components/payment/success-message";
 export default async function DashboardPage({ 
   searchParams 
 }: { 
-  searchParams: { payment?: string } 
+  searchParams: Promise<{ payment?: string }> 
 }) {
   const { userId } = await auth();
   const user = await currentUser();
-  const paymentStatus = searchParams.payment;
+  const resolvedParams = await searchParams;
+  const paymentStatus = resolvedParams.payment;
 
   return (
     <main className="flex-1 container py-10">

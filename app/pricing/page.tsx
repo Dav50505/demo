@@ -54,12 +54,13 @@ const pricingPlans = [
   },
 ];
 
-export default function PricingPage({
+export default async function PricingPage({
   searchParams,
 }: {
-  searchParams: { payment?: string };
+  searchParams: Promise<{ payment?: string }>;
 }) {
-  const paymentStatus = searchParams.payment;
+  const resolvedParams = await searchParams;
+  const paymentStatus = resolvedParams.payment;
 
   return (
     <div className="flex min-h-screen flex-col">
