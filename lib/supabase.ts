@@ -1,4 +1,5 @@
 import { createClient } from '@supabase/supabase-js';
+import { CookieOptions } from '@supabase/ssr';
 
 // Client-side Supabase client
 export const supabaseClient = createClient(
@@ -11,7 +12,7 @@ export async function createServerSupabaseClient() {
   const { createServerClient } = await import('@supabase/ssr');
   const { cookies } = await import('next/headers');
   
-  const cookieStore = cookies();
+  const cookieStore = await cookies();
   
   return createServerClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -23,7 +24,12 @@ export async function createServerSupabaseClient() {
         },
         set(name, value, options) {
           try {
-            cookieStore.set(name, value, options);
+            // Convert Supabase cookie options to Next.js cookie options
+            cookieStore.set({
+              name,
+              value,
+              ...options
+            });
           } catch (error) {
             // Handle errors silently in production
             if (process.env.NODE_ENV !== 'production') {
@@ -33,7 +39,11 @@ export async function createServerSupabaseClient() {
         },
         remove(name, options) {
           try {
-            cookieStore.delete(name, options);
+            // Convert Supabase cookie options to Next.js cookie options
+            cookieStore.delete({
+              name,
+              ...options
+            });
           } catch (error) {
             // Handle errors silently in production
             if (process.env.NODE_ENV !== 'production') {
