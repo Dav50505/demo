@@ -1,5 +1,4 @@
 import { createClient } from '@supabase/supabase-js';
-import { CookieOptions } from '@supabase/ssr';
 
 // Client-side Supabase client
 export const supabaseClient = createClient(
