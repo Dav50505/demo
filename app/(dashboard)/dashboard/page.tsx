@@ -6,18 +6,19 @@ import SuccessMessage from "@/components/payment/success-message";
 export default async function DashboardPage({ 
   searchParams 
 }: { 
-  searchParams: Promise<{ payment?: string }> 
+  searchParams: Promise<{ payment?: string, type?: string }> 
 }) {
   const user = await currentUser();
   const resolvedParams = await searchParams;
   const paymentStatus = resolvedParams.payment;
+  const paymentType = resolvedParams.type;
 
   return (
     <main className="flex-1 container py-10">
       <h1 className="text-3xl font-bold mb-6">Dashboard</h1>
       
       {paymentStatus === 'success' && (
-        <SuccessMessage className="mb-6" />
+        <SuccessMessage className="mb-6" paymentType={paymentType} />
       )}
       
       <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
@@ -38,8 +39,10 @@ export default async function DashboardPage({
           </CardHeader>
           <CardContent>
             <p className="text-sm text-muted-foreground">
-              {paymentStatus === 'success' 
+              {paymentStatus === 'success' && paymentType !== 'onetime'
                 ? "Thank you for subscribing to the Pro plan! Your subscription is now active."
+                : paymentStatus === 'success' && paymentType === 'onetime'
+                ? "Thank you for your one-time purchase! You now have access to premium content."
                 : "You don't have an active subscription yet."}
             </p>
           </CardContent>

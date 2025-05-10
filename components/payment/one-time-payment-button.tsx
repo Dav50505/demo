@@ -3,15 +3,15 @@
 import { Button } from "@/components/ui/button";
 import { useEffect, useState } from "react";
 
-interface PaymentButtonProps {
+interface OneTimePaymentButtonProps {
   text?: string;
   variant?: 'default' | 'outline' | 'destructive' | 'ghost' | 'link' | 'secondary';
 }
 
-export function PaymentButton({ 
-  text = "Subscribe Now", 
+export function OneTimePaymentButton({ 
+  text = "Buy Now", 
   variant = "default" 
-}: PaymentButtonProps) {
+}: OneTimePaymentButtonProps) {
   const [host, setHost] = useState("");
 
   useEffect(() => {
@@ -20,12 +20,11 @@ export function PaymentButton({
   }, []);
 
   const handlePayment = () => {
-    // Base Stripe checkout URL
-
-    const baseUrl = 'https://buy.stripe.com/test_cNicN51fBgnu6j2gyk3ZK01';
+    // Base Stripe checkout URL for one-time payment
+    const baseUrl = 'https://buy.stripe.com/test_aEU8yM4ROf2J3pm6oo';
     
     // Add success and cancel redirect URLs
-    const successUrl = `${host}/dashboard?payment=success`;
+    const successUrl = `${host}/dashboard?payment=success&type=onetime`;
     const cancelUrl = `${host}/pricing?payment=canceled`;
     
     // Build the full URL with redirect parameters
@@ -35,7 +34,7 @@ export function PaymentButton({
   };
 
   return (
-    <Button onClick={handlePayment} variant={variant}>
+    <Button onClick={handlePayment} variant={variant} className="w-full">
       {text}
     </Button>
   );

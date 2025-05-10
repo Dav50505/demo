@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { CheckIcon, Cross2Icon } from "@radix-ui/react-icons";
 import { PaymentButton } from "@/components/ui/payment-button";
+import { OneTimePaymentButton } from "@/components/payment/one-time-payment-button";
 
 const pricingPlans = [
   {
@@ -30,9 +31,10 @@ const pricingPlans = [
     ],
     buttonText: "Subscribe Now",
     buttonVariant: "default" as const,
-    link: "https://buy.stripe.com/test_aEU8yM4ROf2J3pm6oo",
+    link: "https://buy.stripe.com/test_cNicN51fBgnu6j2gyk",
     popular: true,
     isPayment: true,
+    paymentType: "subscription"
   },
   {
     name: "Enterprise",
@@ -54,6 +56,26 @@ const pricingPlans = [
   },
 ];
 
+// Add a one-time payment plan
+const oneTimePlan = {
+  name: "Premium Content",
+  price: "$1",
+  period: "/one-time",
+  description: "One-time purchase for premium content",
+  features: [
+    "Full access to premium content",
+    "Download all resources",
+    "Advanced templates",
+    "Lifetime access",
+  ],
+  buttonText: "Buy Now",
+  buttonVariant: "default" as const,
+  link: "https://buy.stripe.com/test_aEU8yM4ROf2J3pm6oo",
+  popular: false,
+  isPayment: true,
+  paymentType: "onetime"
+};
+
 export default async function PricingPage({
   searchParams,
 }: {
@@ -61,6 +83,9 @@ export default async function PricingPage({
 }) {
   const resolvedParams = await searchParams;
   const paymentStatus = resolvedParams.payment;
+
+  // Add the one-time plan to the list of plans
+  const allPlans = [...pricingPlans, oneTimePlan];
 
   return (
     <div className="flex min-h-screen flex-col">
@@ -85,8 +110,8 @@ export default async function PricingPage({
           </p>
         </div>
 
-        <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-3 max-w-6xl mx-auto">
-          {pricingPlans.map((plan) => (
+        <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-4 max-w-6xl mx-auto">
+          {allPlans.map((plan) => (
             <div
               key={plan.name}
               className={`rounded-lg border p-6 flex flex-col ${
@@ -117,7 +142,11 @@ export default async function PricingPage({
               </ul>
               
               {plan.isPayment ? (
-                <PaymentButton text={plan.buttonText} variant={plan.buttonVariant} />
+                plan.paymentType === "onetime" ? (
+                  <OneTimePaymentButton text={plan.buttonText} variant={plan.buttonVariant} />
+                ) : (
+                  <PaymentButton text={plan.buttonText} variant={plan.buttonVariant} />
+                )
               ) : (
                 <Link href={plan.link}>
                   <Button variant={plan.buttonVariant} className="w-full">

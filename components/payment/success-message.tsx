@@ -6,9 +6,10 @@ import { useEffect, useState } from "react";
 
 interface SuccessMessageProps {
   className?: string;
+  paymentType?: string;
 }
 
-export default function SuccessMessage({ className }: SuccessMessageProps) {
+export default function SuccessMessage({ className, paymentType }: SuccessMessageProps) {
   const [visible, setVisible] = useState(true);
 
   useEffect(() => {
@@ -22,6 +23,8 @@ export default function SuccessMessage({ className }: SuccessMessageProps) {
 
   if (!visible) return null;
 
+  const isOneTime = paymentType === 'onetime';
+
   return (
     <div
       className={cn(
@@ -33,7 +36,9 @@ export default function SuccessMessage({ className }: SuccessMessageProps) {
       <div>
         <h3 className="font-medium text-green-900">Payment Successful!</h3>
         <p className="text-sm mt-1">
-          Thank you for your payment. Your subscription has been activated and you now have access to all Pro features.
+          {isOneTime 
+            ? "Thank you for your purchase. You now have access to the premium content."
+            : "Thank you for your payment. Your subscription has been activated and you now have access to all Pro features."}
         </p>
       </div>
       <button 
